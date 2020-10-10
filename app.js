@@ -13,9 +13,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(adminRoutes);
 app.use(shopRoutes);
 
-app.use('/', (req, res, next) => {
-    res.send("Hello! You asked for home page or your request didnt match any explicitly mentioned URL's");
-});
+app.use((req,res,next)=>{
+    res.status(404).send("<h2>Page not found!</h2>");
+})
 
 app.listen(port, () => {
     console.log("Listening to port: " + port);
