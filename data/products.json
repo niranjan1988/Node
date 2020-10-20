@@ -1,16 +1,16 @@
 [
-    {
-        "id": 12345,
+    {        
         "title": "A Book",
         "imageUrl": "https://img.jakpost.net/c/2016/06/14/2016_06_14_6452_1465897206._large.jpg",
         "description": "This is an awesome book!",
-        "price": "19"
+        "price": "19",
+        "id": "12345"
     },
     {
         "title": "Money Under 30",
         "imageUrl": "https://media.gettyimages.com/photos/stack-of-books-picture-id157482029?s=612x612",
         "description": "Best book for parents: Money A to Z",
-        "price": "20",
+        "price": "25",
         "id": "0.9143922743837638"
     }
 ]
