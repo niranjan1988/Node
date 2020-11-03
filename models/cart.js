@@ -24,13 +24,36 @@ module.exports = class Cart {
                 updatedProduct.quantity += 1;
                 cart.products[index] = updatedProduct;
             } else {
-                cart.products.push({ id, quantity: 1 });
+                cart.products.push({ id, quantity: 1, price: productPrice });
             }
             cart.totalPrice += +productPrice;
             console.log(cart);
             fs.writeFile(p, JSON.stringify(cart), (err) => {
                 console.log("written");
                 cb();
+            });
+        });
+    }
+
+    static deleteProduct(id, productPrice) {
+        fs.readFile(p, (err, fileContent) => {
+            if (err) {
+                return;
+            }
+            let cart = { products: [], totalPrice: 0 };
+            if (!err) {
+                cart = JSON.parse(fileContent);
+            }
+            const index = cart.products.findIndex(p => p.id = id);
+
+            const productQuantity = cart.products[index].quantity;
+            const productPrice = cart.products[index].price;
+            cart.products = cart.products.filter(product => product.id != id);
+            cart.totalPrice = cart.totalPrice - (productQuantity * productPrice);
+
+            fs.writeFile(p, JSON.stringify(cart), (err) => {
+                console.log("written");
+               
             });
         });
     }
