@@ -19,7 +19,7 @@ module.exports = class Cart {
             const existingProduct = cart.products.find(p => p.id == id);
             let updatedProduct;
             if (existingProduct) {
-                const index = cart.products.findIndex(p => p.id = id);
+                const index = cart.products.findIndex(p => p.id == id);
                 updatedProduct = { ...existingProduct };
                 updatedProduct.quantity += 1;
                 cart.products[index] = updatedProduct;
@@ -53,8 +53,19 @@ module.exports = class Cart {
 
             fs.writeFile(p, JSON.stringify(cart), (err) => {
                 console.log("written");
-               
+
             });
+        });
+    }
+
+    static getCart(cb) {
+        fs.readFile(p, (err, fileContent) => {
+            const cart = JSON.parse(fileContent);
+            if(err) {
+                cb(null);
+            } else {
+            cb(cart);
+            }
         });
     }
 } 
