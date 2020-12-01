@@ -27,7 +27,6 @@ module.exports = class Cart {
                 cart.products.push({ id, quantity: 1, price: productPrice });
             }
             cart.totalPrice += +productPrice;
-            console.log(cart);
             fs.writeFile(p, JSON.stringify(cart), (err) => {
                 console.log("written");
                 cb();
