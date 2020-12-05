@@ -1,8 +1,9 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
+const CartItem = require('../models/cart-item');
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then(products=>{
+  Product.findAll().then(products => {
     res.render('shop/product-list', {
       prods: products,
       pageTitle: 'All Products',
@@ -12,37 +13,33 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-Product.findAll().then(products=>{
-  res.render('shop/index', {
-    prods: products,
-    pageTitle: 'Shop',
-    path: '/'
-  });
-}).catch(err => console.log);
+  Product.findAll().then(products => {
+    res.render('shop/index', {
+      prods: products,
+      pageTitle: 'Shop',
+      path: '/'
+    });
+  }).catch(err => console.log);
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.getCart(cart => {
-    Product.fetchAll(products => {
-      const cartProducts = [];
-      for (product of products) {
-        const cartProduct = cart.products.find(prod => prod.id === product.id);
-        if (cartProduct) {
-          cartProducts.push({ productData: product, quantity: cartProduct.quantity })
-        }
-      }
+  // No joining to user table is made. Need changes to fix. Magic functions not working
+  console.log('=======');
+  console.log(req.user);
+  req.user.getCart()
+    .then(cart => {     
+      console.log('inside then');
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
-        products: cartProducts
+        products: cart
       });
-    })
-  })
+    }).catch(err => console.log);
 };
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
+  Product.findByPk(prodId, (product) => {
     Cart.addProduct(prodId, product.price, () => {
       res.redirect('/cart');
     });
@@ -72,16 +69,16 @@ exports.getCheckout = (req, res, next) => {
 };
 
 exports.getProduct = (req, res, next) => {
-  const prodId = req.params.productId;  
-  Product.findAll({where:{id:prodId}})
-  .then(product => {
+  const prodId = req.params.productId;
+  Product.findAll({ where: { id: prodId } })
+    .then(product => {
       res.render('shop/product-detail', {
         product: product[0],
         pageTitle: product[0].title,
         path: '/products'
       });
     }
-  )
-  .catch();
+    )
+    .catch();
 };
 
