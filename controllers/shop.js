@@ -1,9 +1,7 @@
 const Product = require('../models/product');
-const Cart = require('../models/cart');
-const CartItem = require('../models/cart-item');
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then(products => {
+  Product.fetchAll().then(products => {
     res.render('shop/product-list', {
       prods: products,
       pageTitle: 'All Products',
@@ -13,7 +11,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.findAll().then(products => {
+  Product.fetchAll().then(products => {
     res.render('shop/index', {
       prods: products,
       pageTitle: 'Shop',
@@ -23,42 +21,68 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  // No joining to user table is made. Need changes to fix. Magic functions not working
-  console.log('=======');
-  console.log(req.user);
   req.user.getCart()
-    .then(cart => {     
-      console.log('inside then');
+    .then(products => {
+      console.log(products);
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
-        products: cart
+        products: products
       });
-    }).catch(err => console.log);
+    })
 };
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByPk(prodId, (product) => {
-    Cart.addProduct(prodId, product.price, () => {
+  console.log('prodId', prodId);
+  Product.findById(prodId)
+    .then(product => {
+      return req.user.addToCart(product)
+    })
+    .then(result => {
       res.redirect('/cart');
-    });
-  });
+    })
+    .catch(err => {
+      console.log(err);
+    })
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.deleteProduct(prodId, product.price);
-    res.redirect('/cart');
-  })
+  req.user.deleteItemFromCart(prodId)
+    .then(result => {
+      res.redirect('/cart');
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders'
-  });
+  req.user.getOrders()
+  .then(orders=>{
+    console.log(orders);
+    res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Your Orders',
+      orders
+    });
+    // res.redirect('/');
+  });  
+};
+
+exports.postOrders = (req, res, next) => {
+  req.user.addOrder()
+  .then(orders => {
+    res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Your Orders',
+      orders:orders
+    });
+  })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.getCheckout = (req, res, next) => {
@@ -70,15 +94,15 @@ exports.getCheckout = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findAll({ where: { id: prodId } })
+  Product.findById(prodId)
     .then(product => {
+      console.log(product);
       res.render('shop/product-detail', {
-        product: product[0],
-        pageTitle: product[0].title,
+        product: product,
+        pageTitle: product.title,
         path: '/products'
       });
-    }
-    )
+    })
     .catch();
 };
 
