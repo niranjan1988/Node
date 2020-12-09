@@ -50,7 +50,6 @@ exports.postAddProduct = (req, res, next) => {
   const product = new Product(title, price, description, imageUrl,null,req.user._id);
   product.save()
     .then(result => {
-      console.log('Created record');
       res.redirect('/admin/products');
     })
     .catch(err => console.log(err));
